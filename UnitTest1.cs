@@ -16,12 +16,13 @@ namespace TestProject1
             PeaceTable table = new PeaceTable();
 
             table.Add("world");
-            table.Add("!!!");
-            Assert.AreEqual(table, "world!!!");
+            table.Add("!");
+            Assert.AreEqual(table, "world!");
             table.Insert(0, "hello ");
             table.Insert(6, "dog ");
             table.Insert(10, "cat ");
             table.Insert(10, "rat ");
+            table.Add("!!");
             Assert.AreEqual(table, "hello dog rat cat world!!!");
             table.Remove(7, 7);
             Assert.AreEqual(table, "hello dcat world!!!");
@@ -30,12 +31,15 @@ namespace TestProject1
             Assert.AreEqual(table, "");
 
             table.Add("hello");
-            table.Add("!!!");
+            table.Add("!");
             table.Insert(5, " world");
-            Assert.AreEqual(table, "hello world!!!");
+            Assert.AreEqual(table, "hello world!");
             table.Insert(11, " C#");
-            Assert.AreEqual(table, "hello world C#!!!");
-            table.Remove(5, 9);
+            Assert.AreEqual(table, "hello world C#!");
+            table.Add("!!");
+            table.Insert(14, " and C++/CLI");
+            Assert.AreEqual(table, "hello world C# and C++/CLI!!!");
+            table.Remove(5, 19);
             Assert.AreEqual(table, "hello!!!");
         }
     }

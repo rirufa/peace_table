@@ -122,7 +122,14 @@ namespace FooProject
             else
             {
                 var last_node = this.list.Last();
-                this.list.Add(new PeaceTableItem(last_node.start + last_node.length, add_table, this.add_table.LastAddedIndex, s.Length));
+                if(last_node.actual_start + last_node.length == this.add_table.LastAddedIndex)
+                {
+                    last_node.length += s.Length;
+                }
+                else
+                {
+                    this.list.Add(new PeaceTableItem(last_node.start + last_node.length, add_table, this.add_table.LastAddedIndex, s.Length));
+                }
             }
 
             this.add_table.Add(s);
@@ -143,8 +150,17 @@ namespace FooProject
                 update_begin_index = index_node + 1;
             }else if(right_node.length == 0)
             {
-                this.list.Insert(index_node + 1, new PeaceTableItem(index, this.add_table, this.add_table.LastAddedIndex, s.Length));
-                update_begin_index = index_node + 2;
+                if(left_node.actual_start + left_node.length == this.add_table.LastAddedIndex)
+                {
+                    left_node.length += s.Length;
+                    this.list[index_node] = left_node;
+                    update_begin_index = index_node + 1;
+                }
+                else
+                {
+                    this.list.Insert(index_node + 1, new PeaceTableItem(index, this.add_table, this.add_table.LastAddedIndex, s.Length));
+                    update_begin_index = index_node + 2;
+                }
             }
             else
             {
