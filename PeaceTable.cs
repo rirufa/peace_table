@@ -115,24 +115,25 @@ namespace FooProject
 
         public void Add(string s)
         {
+            var target_table = this.add_table;
             if (this.list.Count == 0)
             {
-                this.list.Add(new PeaceTableItem(0, add_table, this.add_table.LastAddedIndex, s.Length));
+                this.list.Add(new PeaceTableItem(0, target_table, target_table.LastAddedIndex, s.Length));
             }
             else
             {
                 var last_node = this.list.Last();
-                if(last_node.actual_start + last_node.length == this.add_table.LastAddedIndex)
+                if(last_node.actual_start + last_node.length == target_table.LastAddedIndex)
                 {
                     last_node.length += s.Length;
                 }
                 else
                 {
-                    this.list.Add(new PeaceTableItem(last_node.start + last_node.length, add_table, this.add_table.LastAddedIndex, s.Length));
+                    this.list.Add(new PeaceTableItem(last_node.start + last_node.length, target_table, target_table.LastAddedIndex, s.Length));
                 }
             }
 
-            this.add_table.Add(s);
+            target_table.Add(s);
         }
 
         public void Insert(int index,string s)
@@ -141,16 +142,17 @@ namespace FooProject
             
             PeaceTableItem left_node, right_node;
             (left_node, right_node) = this.Spilit(index,this.list[index_node]);
+            var target_table = this.add_table;
 
             int update_begin_index;
             //分割すべきノードがない
             if (left_node.length == 0)
             {
-                this.list.Insert(index_node, new PeaceTableItem(index, this.add_table,this.add_table.LastAddedIndex, s.Length));
+                this.list.Insert(index_node, new PeaceTableItem(index, target_table, target_table.LastAddedIndex, s.Length));
                 update_begin_index = index_node + 1;
             }else if(right_node.length == 0)
             {
-                if(left_node.actual_start + left_node.length == this.add_table.LastAddedIndex)
+                if(left_node.actual_start + left_node.length == target_table.LastAddedIndex)
                 {
                     left_node.length += s.Length;
                     this.list[index_node] = left_node;
@@ -158,7 +160,7 @@ namespace FooProject
                 }
                 else
                 {
-                    this.list.Insert(index_node + 1, new PeaceTableItem(index, this.add_table, this.add_table.LastAddedIndex, s.Length));
+                    this.list.Insert(index_node + 1, new PeaceTableItem(index, target_table, target_table.LastAddedIndex, s.Length));
                     update_begin_index = index_node + 2;
                 }
             }
@@ -166,7 +168,7 @@ namespace FooProject
             {
                 this.list[index_node] = left_node;
                 this.list.InsertRange(index_node + 1, new PeaceTableItem[] {
-                    new PeaceTableItem(index, this.add_table,this.add_table.LastAddedIndex, s.Length),
+                    new PeaceTableItem(index, target_table,target_table.LastAddedIndex, s.Length),
                     right_node
                 });
                 update_begin_index = index_node + 2;
@@ -175,7 +177,7 @@ namespace FooProject
             for (int i = update_begin_index; i < this.list.Count; i++)
                 this.list[i].start += s.Length;
 
-            this.add_table.Add(s);
+            target_table.Add(s);
         }
 
         public void Remove(int index,int length)
