@@ -31,7 +31,7 @@ namespace FooProject
         {
             if (this.start > other.start)
                 return 1;
-            if (other.start >= this.start && other.start + other.length <= this.start + this.length)
+            if (other.start >= this.start && other.start + other.length < this.start + this.length)
                 return 0;
             return -1;
         }
@@ -112,6 +112,45 @@ namespace FooProject
     {
         List<PeaceTableItem> list = new List<PeaceTableItem>();
         IStringBuffer add_table = new StringBuffer();
+        int _last_obtain_index_node = -1;
+
+        public char this[int index]
+        {
+            get
+            {
+                PeaceTableItem node = null;
+                
+                if(_last_obtain_index_node != -1)
+                {
+                    node = this.list[_last_obtain_index_node];
+                    if (index < node.start || index >= node.start + node.length)
+                    {
+                        int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
+                        _last_obtain_index_node = index_node;
+                        node = this.list[index_node];
+                    }
+                }
+                else
+                {
+                    int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
+                    _last_obtain_index_node = index_node;
+                    node = this.list[index_node];
+                }
+
+                int index_in_node = index - node.start;
+                return node.text[node.actual_start + index_in_node];
+            }
+        }
+
+        public string ToString(int start,int length)
+        {
+            StringBuilder temp = new StringBuilder();
+            for(int i = 0; i < length; i++)
+            {
+                temp.Append(this[i + start]);
+            }
+            return temp.ToString();
+        }
 
         public void Add(string s)
         {

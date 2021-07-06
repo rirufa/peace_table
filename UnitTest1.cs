@@ -42,5 +42,29 @@ namespace TestProject1
             table.Remove(5, 19);
             Assert.AreEqual(table, "hello!!!");
         }
+
+        [Test]
+        public void IndexerTest()
+        {
+            PeaceTable table = new PeaceTable();
+            table.Add("world");
+            table.Add("!");
+            Assert.AreEqual(table[1],'o');
+            table.Insert(0, "hello ");
+            Assert.AreEqual(table[7], 'o');
+            Assert.AreEqual(table[0], 'h');
+            Assert.AreEqual(table[6], 'w');
+        }
+
+        [Test]
+        public void ToStringTest()
+        {
+            PeaceTable table = new PeaceTable();
+            table.Add("world");
+            table.Add("!");
+            Assert.AreEqual(table.ToString(0,5) , "world");
+            table.Insert(0, "hello ");
+            Assert.AreEqual(table.ToString(0,11), "hello world");
+        }
     }
 }
