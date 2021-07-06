@@ -189,7 +189,6 @@ namespace FooProject
             {
                 var node = this.list[start_index_node];
                 node.text.Remove(node.actual_start + index - node.start, length);
-                node.start = index;
                 node.length = node.length - length;
                 this.list[start_index_node] = node;
             }
