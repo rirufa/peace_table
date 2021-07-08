@@ -118,7 +118,7 @@ namespace FooProject
     {
         List<PeaceTableItem> list = new List<PeaceTableItem>();
         List<IStringBuffer> table_list = new List<IStringBuffer>() { new StringBuffer(), new StringBuffer() };
-        int _last_obtain_index_node = -1;
+        PeaceTableItem _last_obtain = null;
 
         public char this[int index]
         {
@@ -126,20 +126,20 @@ namespace FooProject
             {
                 PeaceTableItem node = null;
                 
-                if(_last_obtain_index_node != -1)
+                if(_last_obtain != null)
                 {
-                    node = this.list[_last_obtain_index_node];
+                    node = _last_obtain;
                     if (index < node.start || index >= node.start + node.length)
                     {
                         int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
-                        _last_obtain_index_node = index_node;
+                        _last_obtain = this.list[index_node];
                         node = this.list[index_node];
                     }
                 }
                 else
                 {
                     int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
-                    _last_obtain_index_node = index_node;
+                    _last_obtain = this.list[index_node];
                     node = this.list[index_node];
                 }
 
