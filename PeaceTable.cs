@@ -108,10 +108,16 @@ namespace FooProject
         }
     }
 
+    public enum PeaceTableType
+    {
+        Origin = 0,
+        Add,
+    }
+
     public class PeaceTable : IEnumerable<char>
     {
         List<PeaceTableItem> list = new List<PeaceTableItem>();
-        IStringBuffer add_table = new StringBuffer();
+        List<IStringBuffer> table_list = new List<IStringBuffer>() { new StringBuffer(), new StringBuffer() };
         int _last_obtain_index_node = -1;
 
         public char this[int index]
@@ -152,9 +158,9 @@ namespace FooProject
             return temp.ToString();
         }
 
-        public void Add(string s)
+        public void Add(string s, PeaceTableType type = PeaceTableType.Add)
         {
-            var target_table = this.add_table;
+            var target_table = this.table_list[(int)type];
             if (this.list.Count == 0)
             {
                 this.list.Add(new PeaceTableItem(0, target_table, target_table.LastAddedIndex, s.Length));
@@ -175,13 +181,13 @@ namespace FooProject
             target_table.Add(s);
         }
 
-        public void Insert(int index,string s)
+        public void Insert(int index,string s, PeaceTableType type = PeaceTableType.Add)
         {
             int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
             
             PeaceTableItem left_node, right_node;
             (left_node, right_node) = this.Spilit(index,this.list[index_node]);
-            var target_table = this.add_table;
+            var target_table = this.table_list[(int)type];
 
             int update_begin_index;
             //分割すべきノードがない
@@ -258,7 +264,8 @@ namespace FooProject
         public void Clear()
         {
             this.list.Clear();
-            this.add_table.Clear();
+            foreach (var table in this.table_list)
+                table.Clear();
         }
 
         public IEnumerator<char> GetEnumerator()

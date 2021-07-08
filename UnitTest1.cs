@@ -66,5 +66,14 @@ namespace TestProject1
             table.Insert(0, "hello ");
             Assert.AreEqual(table.ToString(0,11), "hello world");
         }
+
+        [Test]
+        public void CombainTableTest()
+        {
+            PeaceTable table = new PeaceTable();
+            table.Add("world",PeaceTableType.Origin);
+            table.Add("!");
+            Assert.AreEqual(table, "world!");
+        }
     }
 }
