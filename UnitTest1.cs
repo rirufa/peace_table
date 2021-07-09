@@ -11,25 +11,43 @@ namespace TestProject1
         }
 
         [Test]
-        public void ColletionTest()
+        public void AddTest()
         {
             PeaceTable table = new PeaceTable();
 
             table.Add("world");
             table.Add("!");
             Assert.AreEqual(table, "world!");
+        }
+
+        [Test]
+        public void InsertTest()
+        {
+            PeaceTable table = new PeaceTable();
+
+            table.Add("world!");
             table.Insert(0, "hello ");
             table.Insert(6, "dog ");
             table.Insert(10, "cat ");
             table.Insert(10, "rat ");
             table.Add("!!");
             Assert.AreEqual(table, "hello dog rat cat world!!!");
-            table.Remove(7, 7);
-            Assert.AreEqual(table, "hello dcat world!!!");
+        }
 
+        [Test]
+        public void ClearTest()
+        {
+            PeaceTable table = new PeaceTable();
+
+            table.Add("world!");
             table.Clear();
             Assert.AreEqual(table, "");
+        }
 
+        [Test]
+        public void RemoveTest()
+        {
+            PeaceTable table = new PeaceTable();
             table.Add("hello");
             table.Add("!");
             table.Insert(5, " world");

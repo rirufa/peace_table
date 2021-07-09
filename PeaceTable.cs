@@ -229,15 +229,24 @@ namespace FooProject
         {
             int start_index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
             int end_index_node = this.list.BinarySearch(new PeaceTableItem(index + length - 1, 0));
+            int? removed_actual_index = null;
+            int update_start_index = start_index_node + 1;
 
-            PeaceTableItem left_node, right_node;
+            PeaceTableItem left_node = null, right_node = null;
 
             if(start_index_node == end_index_node)
             {
                 var node = this.list[start_index_node];
                 node.text.Remove(node.actual_start + index - node.start, length);
                 node.length = node.length - length;
+                removed_actual_index = node.actual_start;   //後で後続のノードを修正するために削除した位置を覚えておく
                 this.list[start_index_node] = node;
+            }
+            else if(left_node == null && right_node == null)
+            {
+                int remove_start_index = start_index_node;
+                update_start_index = remove_start_index;
+                this.list.RemoveRange(start_index_node, end_index_node - remove_start_index + 1);
             }
             else
             {
@@ -257,8 +266,12 @@ namespace FooProject
                 this.list.RemoveRange(remove_start_index, end_index_node - remove_start_index + 1);
             }
 
-            for (int i = start_index_node + 1; i < this.list.Count; i++)
+            for (int i = update_start_index; i < this.list.Count; i++)
+            {
                 this.list[i].start -= length;
+                if (this.list[i].actual_start > removed_actual_index)   //実際にさしてる位置はバラバラ
+                    this.list[i].actual_start -= length;
+            }
         }
 
         public void Clear()
