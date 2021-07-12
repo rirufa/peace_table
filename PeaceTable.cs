@@ -1,22 +1,31 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FooProject
 {
-    public class PeaceTableItem : IComparable<PeaceTableItem>,IEnumerable<char>
+    public class PeaceTableItem : EqualityComparer<PeaceTableItem>,IComparable<PeaceTableItem>,IEnumerable<char>
     {
         public int start, length;
-        public IStringBuffer text;
+        public IStringBuffer buffer;
         public int actual_start;
+
+        public string Text
+        {
+            get
+            {
+                return this.buffer.ToString(actual_start, length);
+            }
+        }
 
         public PeaceTableItem(int start,IStringBuffer s,int actual_start, int length)
         {
             this.start = start;
-            this.text = s;
+            this.buffer = s;
             this.length = length;
             this.actual_start = actual_start;
         }
@@ -29,21 +38,42 @@ namespace FooProject
 
         public int CompareTo(PeaceTableItem other)
         {
-            if (this.start > other.start)
-                return 1;
-            if (other.start >= this.start && other.start + other.length < this.start + this.length)
+            if (other.start >= this.start && other.start < this.start + this.length)
                 return 0;
-            return -1;
+            if (other.start < this.start)
+                return -1;
+            return 1;
         }
         public IEnumerator<char> GetEnumerator()
         {
             for (int i = 0; i < this.length; i++)
-                yield return text[this.actual_start + i];
+                yield return buffer[this.actual_start + i];
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public override bool Equals(object obj)
+        {
+            PeaceTableItem y = (PeaceTableItem)obj;
+            return y.start >= this.start && y.start < this.start + this.length;
+        }
+
+        public override bool Equals([AllowNull] PeaceTableItem x, [AllowNull] PeaceTableItem y)
+        {
+            return y.start >= x.start && y.start < x.start + x.length;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override int GetHashCode([DisallowNull] PeaceTableItem obj)
+        {
+            return obj.GetHashCode();
         }
     }
 
@@ -69,6 +99,8 @@ namespace FooProject
         public void Remove(int index, int length);
 
         public void Clear();
+
+        public string ToString(int index, int length);
     }
 
 
@@ -106,6 +138,11 @@ namespace FooProject
             text.Remove(index, length);
             this.last_add_index -= length;
         }
+
+        public string ToString(int index, int length)
+        {
+            return this.text.ToString(index, length);
+        }
     }
 
     public enum PeaceTableType
@@ -131,20 +168,20 @@ namespace FooProject
                     node = _last_obtain;
                     if (index < node.start || index >= node.start + node.length)
                     {
-                        int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
+                        int index_node = this.Find(index);
                         _last_obtain = this.list[index_node];
                         node = this.list[index_node];
                     }
                 }
                 else
                 {
-                    int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
+                    int index_node = this.Find(index);
                     _last_obtain = this.list[index_node];
                     node = this.list[index_node];
                 }
 
                 int index_in_node = index - node.start;
-                return node.text[node.actual_start + index_in_node];
+                return node.buffer[node.actual_start + index_in_node];
             }
         }
 
@@ -183,7 +220,7 @@ namespace FooProject
 
         public void Insert(int index,string s, PeaceTableType type = PeaceTableType.Add)
         {
-            int index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
+            int index_node = this.Find(index);
             
             PeaceTableItem left_node, right_node;
             (left_node, right_node) = this.Spilit(index,this.list[index_node]);
@@ -227,50 +264,38 @@ namespace FooProject
 
         public void Remove(int index,int length)
         {
-            int start_index_node = this.list.BinarySearch(new PeaceTableItem(index, 0));
-            int end_index_node = this.list.BinarySearch(new PeaceTableItem(index + length - 1, 0));
-            int? removed_actual_index = null;
+            int start_index_node = this.Find(index);
+            int end_index_node = this.Find(index + length - 1);
             int update_start_index = start_index_node + 1;
 
             PeaceTableItem left_node = null, right_node = null;
 
-            if(start_index_node == end_index_node)
+            int remove_start_index = start_index_node + 1;
+            (left_node, right_node) = this.Spilit(index, this.list[start_index_node]);
+            if (left_node.length == 0)
+                update_start_index = remove_start_index = start_index_node;
+            else
+                this.list[start_index_node] = left_node;
+
+            (left_node, right_node) = this.Spilit(index + length, this.list[end_index_node]);
+            if (right_node.length == 0)
             {
-                var node = this.list[start_index_node];
-                node.text.Remove(node.actual_start + index - node.start, length);
-                node.length = node.length - length;
-                removed_actual_index = node.actual_start;   //後で後続のノードを修正するために削除した位置を覚えておく
-                this.list[start_index_node] = node;
+                this.list[end_index_node] = left_node;
             }
-            else if(left_node == null && right_node == null)
+            else if (start_index_node == end_index_node)
             {
-                int remove_start_index = start_index_node;
-                update_start_index = remove_start_index;
-                this.list.RemoveRange(start_index_node, end_index_node - remove_start_index + 1);
+                this.list.Insert(start_index_node, right_node);
             }
             else
             {
-                int remove_start_index = start_index_node + 1;
-                (left_node, right_node) = this.Spilit(index, this.list[start_index_node]);
-                if(left_node.length == 0)
-                    remove_start_index = start_index_node;
-                else
-                    this.list[start_index_node] = left_node;
-
-                (left_node, right_node) = this.Spilit(index + length - 1, this.list[end_index_node]);
-                if(right_node.length == 0)
-                    this.list[end_index_node] = left_node;
-                else
-                    this.list[end_index_node] = right_node;
-
-                this.list.RemoveRange(remove_start_index, end_index_node - remove_start_index + 1);
+                this.list.Insert(end_index_node + 1, right_node);
             }
+
+            this.list.RemoveRange(remove_start_index, end_index_node - remove_start_index + 1);
 
             for (int i = update_start_index; i < this.list.Count; i++)
             {
                 this.list[i].start -= length;
-                if (this.list[i].actual_start > removed_actual_index)   //実際にさしてる位置はバラバラ
-                    this.list[i].actual_start -= length;
             }
         }
 
@@ -290,6 +315,15 @@ namespace FooProject
             }
         }
 
+        int Find(int index)
+        {
+            var target_node = new PeaceTableItem(index, 0);
+            int index_node = this.list.BinarySearch(target_node);
+            if(index_node < 0)
+                return this.list.IndexOf(target_node);
+            return index_node;
+        }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
@@ -298,8 +332,8 @@ namespace FooProject
         (PeaceTableItem,PeaceTableItem) Spilit(int index, PeaceTableItem node)
         {
             int left_node_length = index - node.start;
-            var left_node = new PeaceTableItem(node.start, node.text, node.actual_start, left_node_length);
-            var right_node = new PeaceTableItem(index, node.text, node.actual_start + left_node_length, node.length - left_node_length);
+            var left_node = new PeaceTableItem(node.start, node.buffer, node.actual_start, left_node_length);
+            var right_node = new PeaceTableItem(index, node.buffer, node.actual_start + left_node_length, node.length - left_node_length);
             return (left_node, right_node);
         }
     }

@@ -49,16 +49,20 @@ namespace TestProject1
         {
             PeaceTable table = new PeaceTable();
             table.Add("hello");
-            table.Add("!");
-            table.Insert(5, " world");
-            Assert.AreEqual(table, "hello world!");
-            table.Insert(11, " C#");
-            Assert.AreEqual(table, "hello world C#!");
             table.Add("!!");
-            table.Insert(14, " and C++/CLI");
-            Assert.AreEqual(table, "hello world C# and C++/CLI!!!");
-            table.Remove(5, 19);
-            Assert.AreEqual(table, "hello!!!");
+            table.Insert(5, " world");
+            table.Add("!!");
+            table.Remove(5, 6);
+            Assert.AreEqual(table, "hello!!!!");
+            table.Remove(1, 6);
+            Assert.AreEqual(table, "h!!");
+            table.Insert(1, "ello");
+            table.Remove(0, 6);
+            Assert.AreEqual(table, "!");
+            table.Insert(0, "world");
+            table.Insert(0, "hello ");
+            table.Remove(0, 11);
+            Assert.AreEqual(table, "!");
         }
 
         [Test]
