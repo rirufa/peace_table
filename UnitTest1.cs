@@ -97,8 +97,11 @@ namespace TestProject1
         {
             PeaceTable table = new PeaceTable();
             table.Add("world",PeaceTableType.Origin);
+            table.Insert(0, "hello ");
             table.Add("!");
-            Assert.AreEqual(table, "world!");
+            table.Remove(0, 5);
+            table.Insert(0, "welcome to this");
+            Assert.AreEqual(table, "welcome to this world!");
         }
     }
 }

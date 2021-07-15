@@ -284,6 +284,7 @@ namespace FooProject
                 if (right_node.length != 0)
                 {
                     this.list[remove_index] = right_node;
+                    this.list[remove_index].start = index;
                     remove_index = -1;
                 }
 
