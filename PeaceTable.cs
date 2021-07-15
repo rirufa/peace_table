@@ -270,28 +270,48 @@ namespace FooProject
 
             PeaceTableItem left_node = null, right_node = null;
 
-            int remove_start_index = start_index_node + 1;
-            (left_node, right_node) = this.Spilit(index, this.list[start_index_node]);
-            if (left_node.length == 0)
-                update_start_index = remove_start_index = start_index_node;
-            else
-                this.list[start_index_node] = left_node;
+            if (start_index_node == end_index_node)
+            {
+                int remove_index = start_index_node;
+                (left_node, right_node) = this.Spilit(index, this.list[remove_index]);
+                if (left_node.length != 0)
+                {
+                    this.list.Insert(start_index_node, left_node);
+                    remove_index++;
+                }
 
-            (left_node, right_node) = this.Spilit(index + length, this.list[end_index_node]);
-            if (right_node.length == 0)
-            {
-                this.list[end_index_node] = left_node;
-            }
-            else if (start_index_node == end_index_node)
-            {
-                this.list.Insert(start_index_node, right_node);
+                (left_node, right_node) = this.Spilit(index + length, this.list[remove_index]);
+                if (right_node.length != 0)
+                {
+                    this.list[remove_index] = right_node;
+                    remove_index = -1;
+                }
+
+                if (remove_index == start_index_node)
+                {
+                    this.list.RemoveAt(remove_index);
+                    update_start_index = start_index_node;
+                }
             }
             else
             {
-                this.list.Insert(end_index_node + 1, right_node);
+                int remove_start_index = start_index_node + 1;
+
+                (left_node, right_node) = this.Spilit(index, this.list[start_index_node]);
+                if (left_node.length == 0)
+                    update_start_index = remove_start_index = start_index_node;
+                else
+                    this.list[start_index_node] = left_node;
+
+                (left_node, right_node) = this.Spilit(index + length, this.list[end_index_node]);
+                if (right_node.length == 0)
+                    this.list[end_index_node] = left_node;
+                else
+                    this.list.Insert(end_index_node + 1, right_node);
+
+                this.list.RemoveRange(remove_start_index, end_index_node - remove_start_index + 1);
             }
 
-            this.list.RemoveRange(remove_start_index, end_index_node - remove_start_index + 1);
 
             for (int i = update_start_index; i < this.list.Count; i++)
             {

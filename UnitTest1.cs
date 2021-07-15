@@ -63,6 +63,9 @@ namespace TestProject1
             table.Insert(0, "hello ");
             table.Remove(0, 11);
             Assert.AreEqual(table, "!");
+            table.Insert(0, "hello");
+            table.Remove(1, 3);
+            Assert.AreEqual(table, "ho!");
         }
 
         [Test]
