@@ -30,7 +30,7 @@ namespace TestProject1
             table.Insert(6, "dog ");
             table.Insert(10, "cat ");
             table.Insert(10, "rat ");
-            table.Add("!!");
+            table.Insert(23, "!!");
             Assert.AreEqual(table, "hello dog rat cat world!!!");
         }
 
@@ -100,8 +100,12 @@ namespace TestProject1
             table.Insert(0, "hello ");
             table.Add("!");
             table.Remove(0, 5);
-            table.Insert(0, "welcome to this");
-            Assert.AreEqual(table, "welcome to this world!");
+            table.Insert(0, "welcome to the");
+            table.Remove(11, 3);
+            table.Insert(11, "this");
+            table.Remove(21, 1);
+            table.Insert(21, "!!!");
+            Assert.AreEqual(table, "welcome to this world!!!");
         }
     }
 }

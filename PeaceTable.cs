@@ -268,29 +268,29 @@ namespace FooProject
             int end_index_node = this.Find(index + length - 1);
             int update_start_index = start_index_node + 1;
 
-            PeaceTableItem left_node = null, right_node = null;
+            PeaceTableItem left_node = null, middle_node = null, right_node = null;
 
             if (start_index_node == end_index_node)
             {
-                int remove_index = start_index_node;
-                (left_node, right_node) = this.Spilit(index, this.list[remove_index]);
-                if (left_node.length != 0)
+                (left_node, right_node) = this.Spilit(index, this.list[start_index_node]);
+                (middle_node, right_node) = this.Spilit(index + length, right_node);
+                if(left_node.length != 0 && middle_node.length != 0 && right_node.length != 0)
                 {
-                    this.list.Insert(start_index_node, left_node);
-                    remove_index++;
+                    this.list[start_index_node] = left_node;
+                    this.list.Insert(start_index_node + 1, right_node);
                 }
-
-                (left_node, right_node) = this.Spilit(index + length, this.list[remove_index]);
-                if (right_node.length != 0)
+                else if(left_node.length == 0 && middle_node.length != 0 && right_node.length != 0)
                 {
-                    this.list[remove_index] = right_node;
-                    this.list[remove_index].start = index;
-                    remove_index = -1;
+                    this.list[start_index_node] = right_node;
+                    update_start_index = start_index_node;
                 }
-
-                if (remove_index == start_index_node)
+                else if (left_node.length != 0 && middle_node.length != 0 && right_node.length == 0)
                 {
-                    this.list.RemoveAt(remove_index);
+                    this.list[start_index_node] = left_node;
+                }
+                else if (left_node.length == 0 && middle_node.length != 0 && right_node.length == 0)
+                {
+                    this.list.RemoveAt(start_index_node);
                     update_start_index = start_index_node;
                 }
             }
@@ -341,7 +341,12 @@ namespace FooProject
             var target_node = new PeaceTableItem(index, 0);
             int index_node = this.list.BinarySearch(target_node);
             if(index_node < 0)
+            {
+                var last_node = this.list.Last();
+                if (index == last_node.start + last_node.length)
+                    return this.list.Count - 1;
                 return this.list.IndexOf(target_node);
+            }
             return index_node;
         }
 
